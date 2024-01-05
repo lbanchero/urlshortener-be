@@ -1,5 +1,6 @@
 using System.Text;
 using UrlShortener.Business.Exceptions;
+using UrlShortener.Business.Extensions;
 using UrlShortener.Business.Interfaces;
 using UrlShortener.Data.Interfaces;
 using UrlShortener.Data.Models;
@@ -10,22 +11,35 @@ public class LinkService : ILinkService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILinkRepository _linkRepository;
-    private static readonly Random Random = new();
-    private const string Chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private readonly IClickRepository _clickRepository;
 
-    public LinkService(ILinkRepository linkRepository, IUnitOfWork unitOfWork)
+    public LinkService(ILinkRepository linkRepository,
+        IClickRepository clickRepository,
+        IUnitOfWork unitOfWork)
     {
         _linkRepository = linkRepository;
+        _clickRepository = clickRepository;
         _unitOfWork = unitOfWork;
     }
     
-    public async Task<Link?> Create(string url)
+    public async Task<Link> GetAsync(string shortCode)
+    {
+        var link = await _linkRepository.GetByShortCodeAsync(shortCode);
+        
+        if (link == null) throw new LinkNotFoundException();
+        
+        await CreateClickAsync(link);
+
+        return link;
+    }
+
+    public async Task<Link> CreateAsync(string url)
     {
         var link = new Link
         {
             Id = Guid.NewGuid(),
             Url = url,
-            ShortCode = GenerateShortUrl(),
+            ShortCode = StringHelper.GenerateCode(),
             CreatedAt = DateTimeOffset.UtcNow
         };
         
@@ -36,22 +50,17 @@ public class LinkService : ILinkService
         return link;
     }
 
-    public async Task<Link?> GetAsync(string shortCode)
+    public async Task<Link> GetStatsAsync(string shortUrl)
     {
-        return await _linkRepository.GetByShortCodeAsync(shortCode);
-    }
-
-    public async Task<Link> GetStats(string shortUrl)
-    {
-        var link = await _linkRepository.GetByShortCodeAsync(shortUrl);
+        var linkWithClicks = await _linkRepository.GetByShortCodeWithClicksAsync(shortUrl);
         
-        if (link == null) throw new LinkNotFoundException();
+        if (linkWithClicks == null) throw new LinkNotFoundException();
 
         //TODO: Refactor this to return a specific model.
-        return link;
+        return linkWithClicks;
     }
 
-    public async Task Delete(string shortCode)
+    public async Task DeleteAsync(string shortCode)
     {
         var link = await _linkRepository.GetByShortCodeAsync(shortCode);
 
@@ -62,15 +71,19 @@ public class LinkService : ILinkService
         await _unitOfWork.SaveChangesAsync();
     }
     
-    private static string GenerateShortUrl(int length = 6)
+    private async Task CreateClickAsync(Link link)
     {
-        var stringBuilder = new StringBuilder(length);
-    
-        for (var i = 0; i < length; i++)
+        var click = new Click
         {
-            stringBuilder.Append(Chars[Random.Next(Chars.Length)]);
-        }
-    
-        return stringBuilder.ToString();
+            CreatedAt = DateTimeOffset.Now,
+            Id = Guid.NewGuid(),
+            LinkId = link.Id
+        };
+
+        link.Clicks.Add(click);
+            
+        await _clickRepository.CreateAsync(click);
+        
+        await _unitOfWork.SaveChangesAsync();
     }
 }

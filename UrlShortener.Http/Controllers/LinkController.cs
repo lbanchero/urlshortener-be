@@ -27,8 +27,6 @@ public class LinkController : ControllerBase
     {
         var link = await _linkService.GetAsync(shortUrl);
         
-        if (link == null) return NotFound();
-        
         return Ok(link.Url);
     }
 
@@ -40,7 +38,7 @@ public class LinkController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post([FromBody]ShortenRequest request)
     {
-        var link = await _linkService.Create(request.Url);
+        var link = await _linkService.CreateAsync(request.Url);
         
         return Ok(link);
     }
@@ -53,9 +51,9 @@ public class LinkController : ControllerBase
     [HttpGet("{shortUrl}/stats")]
     public async Task<IActionResult> GetStats(string shortUrl)
     {
-        var link = await _linkService.GetStats(shortUrl);
+        var link = await _linkService.GetStatsAsync(shortUrl);
 
-        return Ok(link);
+        return Ok(link.Clicks);
     }
     
     /// <summary>
@@ -66,7 +64,7 @@ public class LinkController : ControllerBase
     [HttpDelete("{shortUrl}")]
     public async Task<IActionResult> Delete(string shortUrl)
     {
-        await _linkService.Delete(shortUrl);
+        await _linkService.DeleteAsync(shortUrl);
         
         return Ok();
     }

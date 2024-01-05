@@ -10,7 +10,8 @@ public static class DataServiceRegistration
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<ILinkRepository, LinkRepository>();
-     
+        services.AddScoped<IClickRepository, ClickRepository>();
+
         services.AddDbContext<UrlShortenerDbContext>(
             o => o.UseInMemoryDatabase("UrlShortenerDb"));
         

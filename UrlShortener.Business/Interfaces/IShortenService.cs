@@ -4,11 +4,11 @@ namespace UrlShortener.Business.Interfaces;
 
 public interface ILinkService
 {
-    public Task<Link?> Create(string url);
+    public Task<Link> CreateAsync(string url);
     
-    public Task<Link?> GetAsync(string shortCode);
+    public Task<Link> GetAsync(string shortCode);
     
-    public Task<Link> GetStats(string shortUrl);
+    public Task<Link> GetStatsAsync(string shortUrl);
     
-    public Task Delete(string shortCode);
+    public Task DeleteAsync(string shortCode);
 }

@@ -12,6 +12,7 @@ public class LinkRepository : ILinkRepository
     {
         _context = context;
     }
+    
 
     public async Task CreateAsync(Link? link)
     {
@@ -20,11 +21,25 @@ public class LinkRepository : ILinkRepository
 
     public async Task<Link?> GetByShortCodeAsync(string shortCode)
     {
-        return await _context.Links.FirstOrDefaultAsync(x => x.ShortCode == shortCode);
+        return await GetByShortCode(shortCode).FirstOrDefaultAsync();
+    }
+    
+    public async Task<Link?> GetByShortCodeWithClicksAsync(string shortCode)
+    {
+        return await GetByShortCode(shortCode)
+            .Include(x => x.Clicks)
+            .FirstOrDefaultAsync();
+    }
+
+    public void Update(Link link)
+    {
+        _context.Links.Update(link);
     }
 
     public void DeleteAsync(Link link)
     {
-        _context.Remove(link);
+        _context.Links.Remove(link);
     }
+    
+    private IQueryable<Link> GetByShortCode(string shortCode) => _context.Links.Where(x => x.ShortCode == shortCode);
 }
