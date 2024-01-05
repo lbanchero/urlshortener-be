@@ -1,8 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using UrlShortener.Business;
-using UrlShortener.Business.Interfaces;
 using UrlShortener.Data;
-using UrlShortener.Data.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,12 +8,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<ILinkRepository, LinkRepository>();
-builder.Services.AddScoped<ILinkService, LinkService>();
-
-builder.Services.AddDbContext<UrlShortenerDbContext>(
-    o => o.UseInMemoryDatabase("UrlShortenerDb"));
+builder.Services.AddDataServices();
+builder.Services.AddBusinessServices();
 
 var app = builder.Build();
 
