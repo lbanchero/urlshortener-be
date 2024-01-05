@@ -8,7 +8,7 @@ public interface ILinkService
     
     public Task<Link> GetAsync(string shortCode);
     
-    public Task<Link> GetStatsAsync(string shortUrl);
+    public Task<Link> GetStatsAsync(string shortCode);
     
     public Task DeleteAsync(string shortCode);
 }

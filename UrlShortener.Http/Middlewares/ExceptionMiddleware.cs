@@ -21,19 +21,28 @@ public class ExceptionMiddleware
         }
         catch (LinkNotFoundException)
         {
-            await HandleNotFoundExceptionAsync(httpContext);
+            await HandleExceptionAsync(httpContext, HttpStatusCode.NotFound);
+        }
+        catch (ArgumentException)
+        {
+            await HandleExceptionAsync(httpContext, HttpStatusCode.BadRequest);
         }
     }
 
-    private static Task HandleNotFoundExceptionAsync(HttpContext context)
+    private static Task HandleExceptionAsync(HttpContext context, HttpStatusCode statusCode)
     {
         context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+        context.Response.StatusCode = (int)statusCode;
 
         var response = new
         {
-            StatusCode = context.Response.StatusCode,
-            Message = "Resource not found"
+            context.Response.StatusCode,
+            Message = statusCode switch
+            {
+                HttpStatusCode.NotFound => "Resource not found",
+                HttpStatusCode.BadRequest => "Request is invalid",
+                _ => "An error occurred"
+            }
         };
 
         return context.Response.WriteAsync(JsonConvert.SerializeObject(response));

@@ -24,9 +24,13 @@ public class LinkService : ILinkService
     
     public async Task<Link> GetAsync(string shortCode)
     {
+        if (string.IsNullOrWhiteSpace(shortCode))
+            throw new ArgumentException(null, nameof(shortCode));
+        
         var link = await _linkRepository.GetByShortCodeAsync(shortCode);
         
-        if (link == null) throw new LinkNotFoundException();
+        if (link == null)
+            throw new LinkNotFoundException();
         
         await CreateClickAsync(link);
 
@@ -35,6 +39,9 @@ public class LinkService : ILinkService
 
     public async Task<Link> CreateAsync(string url)
     {
+        if (string.IsNullOrWhiteSpace(url))
+            throw new ArgumentException(null, nameof(url));
+        
         var link = new Link
         {
             Id = Guid.NewGuid(),
@@ -50,9 +57,12 @@ public class LinkService : ILinkService
         return link;
     }
 
-    public async Task<Link> GetStatsAsync(string shortUrl)
+    public async Task<Link> GetStatsAsync(string shortCode)
     {
-        var linkWithClicks = await _linkRepository.GetByShortCodeWithClicksAsync(shortUrl);
+        if (string.IsNullOrWhiteSpace(shortCode))
+            throw new ArgumentException(null, nameof(shortCode));
+        
+        var linkWithClicks = await _linkRepository.GetByShortCodeWithClicksAsync(shortCode);
         
         if (linkWithClicks == null) throw new LinkNotFoundException();
 
