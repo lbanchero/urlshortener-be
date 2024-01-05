@@ -13,7 +13,6 @@ public class LinkRepository : ILinkRepository
         _context = context;
     }
     
-
     public async Task CreateAsync(Link? link)
     {
         await _context.Links.AddAsync(link);

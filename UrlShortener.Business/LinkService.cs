@@ -65,6 +65,8 @@ public class LinkService : ILinkService
         var link = await _linkRepository.GetByShortCodeAsync(shortCode);
 
         if (link == null) throw new LinkNotFoundException();
+
+        await _clickRepository.DeleteByLinkId(link.Id);
         
         _linkRepository.DeleteAsync(link);
         
