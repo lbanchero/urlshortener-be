@@ -20,12 +20,12 @@ public class LinkController : ControllerBase
     /// Gets the original URL object from the short URL
     /// Creates a new Click object to track activity
     /// </summary>
-    /// <param name="shortUrl"></param>
+    /// <param name="shortCode"></param>
     /// <returns></returns>
-    [HttpGet("{shortUrl}")]
-    public async Task<IActionResult> Get(string shortUrl)
+    [HttpGet("{shortCode}")]
+    public async Task<IActionResult> Get(string shortCode)
     {
-        var link = await _linkService.GetAsync(shortUrl);
+        var link = await _linkService.GetAsync(shortCode);
         
         return Ok(link.Url);
     }
@@ -46,12 +46,12 @@ public class LinkController : ControllerBase
     /// <summary>
     /// Gets the statistics for a URL shortening object
     /// </summary>
-    /// <param name="shortUrl"></param>
+    /// <param name="shortCode"></param>
     /// <returns></returns>
-    [HttpGet("{shortUrl}/stats")]
-    public async Task<IActionResult> GetStats(string shortUrl)
+    [HttpGet("{shortCode}/stats")]
+    public async Task<IActionResult> GetStats(string shortCode)
     {
-        var link = await _linkService.GetStatsAsync(shortUrl);
+        var link = await _linkService.GetStatsAsync(shortCode);
 
         return Ok(link.Clicks);
     }
@@ -59,12 +59,12 @@ public class LinkController : ControllerBase
     /// <summary>
     /// Deletes a URL shortening object with the associated statistics
     /// </summary>
-    /// <param name="shortUrl"></param>
+    /// <param name="shortCode"></param>
     /// <returns></returns>
-    [HttpDelete("{shortUrl}")]
-    public async Task<IActionResult> Delete(string shortUrl)
+    [HttpDelete("{shortCode}")]
+    public async Task<IActionResult> Delete(string shortCode)
     {
-        await _linkService.DeleteAsync(shortUrl);
+        await _linkService.DeleteAsync(shortCode);
         
         return Ok();
     }
