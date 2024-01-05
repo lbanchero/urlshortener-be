@@ -56,7 +56,6 @@ public class LinkService : ILinkService
         
         if (linkWithClicks == null) throw new LinkNotFoundException();
 
-        //TODO: Refactor this to return a specific model.
         return linkWithClicks;
     }
 

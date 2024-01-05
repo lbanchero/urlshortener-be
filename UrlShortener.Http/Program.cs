@@ -12,17 +12,25 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDataServices();
 builder.Services.AddBusinessServices();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("OpenCorsPolicy", corsPolicyBuilder =>
+    {
+        corsPolicyBuilder
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseCors("OpenCorsPolicy");
 
 app.UseMiddleware<ExceptionMiddleware>();
 
-app.UseHttpsRedirection();
 app.MapControllers();
 app.Run();
