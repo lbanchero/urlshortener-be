@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddHealthChecks();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -24,13 +25,13 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
-
+app.UseMiddleware<ExceptionMiddleware>();
+app.MapHealthChecks("/healthz");
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseCors("OpenCorsPolicy");
 
-app.UseMiddleware<ExceptionMiddleware>();
-
+app.UseAuthorization();
 app.MapControllers();
 app.Run();
